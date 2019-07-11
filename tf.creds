@@ -1,0 +1,31 @@
+#!/bin/bash
+# client_id="b0ff1361-ea2d-4ce0-85d1-5b37c960c86b"
+client_id="$(security find-generic-password  -a tudorfil -l wrk_client_id -w)"
+tenant_id="$(security find-generic-password  -a tudorfil -l wrk_tenant_id -w)"
+subscription_id="$(security find-generic-password  -a tudorfil -l wrk_subscription_id -w)"
+password="$(security find-generic-password  -a tudorfil -l wrk_az_password -w)"
+wrk_root_pw="$(security find-generic-password  -a tudorfil -l wrk_root_pw -w)"
+
+export ARM_CLIENT_ID="$client_id"
+export ARM_CLIENT_SECRET="$password"
+export ARM_SUBSCRIPTION_ID="$subscription_id"
+export ARM_TENANT_ID="$tenant_id"
+
+export TF_VAR_ARM_CLIENT_ID="$client_id"
+export TF_VAR_ARM_CLIENT_SECRET="$password"
+export TF_VAR_ARM_SUBSCRIPTION_ID="$subscription_id"
+export TF_VAR_ARM_TENANT_ID="$tenant_id"
+
+export TF_VAR_vnet_rg="homework-tudorfil-rg"
+export TF_VAR_az_location="westeurope"
+export TF_VAR_az_location1="northeurope"
+
+export TF_VAR_vnet_cidr="10.0.0.0/24"
+export TF_VAR_vnet_name="vnet_vn"
+
+export TF_VAR_wrk_root_pw="$wrk_root_pw"
+
+export TF_CLI_CONFIG_FILE="$HOME/.terraformrc"
+export TF_INPUT=0
+
+
