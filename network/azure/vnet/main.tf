@@ -12,6 +12,7 @@ variable "az_location1" {}
 
 variable "vnet_cidr"   {}
 variable "vnet_name"  {}
+variable "vnet_name1"  {}
 
 variable "wrk_root_pw"  {}
 
@@ -49,6 +50,14 @@ resource "azurerm_virtual_network" "vnet_vn" {
   // tags = "${var.tags_network}"
   }
 
+resource "azurerm_virtual_network" "vnet_vn1" {
+  name                = "${var.vnet_name1}"
+  address_space       = ["${var.vnet_cidr}"]
+  location            = "${var.az_location1}"
+  resource_group_name = "homework-tudorfil-rg"
+  // tags = "${var.tags_network}"
+  }
+
 ######################################################
 #  DNS
 ######################################################
@@ -73,7 +82,15 @@ resource "azurerm_subnet" "prodmgmt_sn" {
   name                 = "prodmgmt_sn"
   resource_group_name  = "homework-tudorfil-rg"
   virtual_network_name = "${var.vnet_name}"
-  address_prefix       = "10.0.0.65/26"
+  address_prefix       = "10.0.0.64/26"
+  // network_security_group_id = "${azurerm_network_security_group.prodvn_nsg.id}"
+}
+
+resource "azurerm_subnet" "prodmgmt_sn1" {
+  name                 = "prodmgmt_sn1"
+  resource_group_name  = "homework-tudorfil-rg"
+  virtual_network_name = "${var.vnet_name1}"
+  address_prefix       = "10.0.0.128/26"
   // network_security_group_id = "${azurerm_network_security_group.prodvn_nsg.id}"
 }
 
@@ -186,7 +203,6 @@ resource "azurerm_network_interface" "apphost1nic" {
     subnet_id                     = "${azurerm_subnet.prodmgmt_sn.id}"
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = "${azurerm_public_ip.apphost1publicip.id}"
-
   }
 }
 
@@ -218,7 +234,7 @@ resource "azurerm_virtual_machine" "apphost1" {
   os_profile_linux_config {
     disable_password_authentication = false
         ssh_keys {
-          path     = "~/.ssh/authorized_keys"
+          path     = "/home/tudorfil/.ssh/authorized_keys"
           key_data = "${file("~/.ssh/id_rsa.pub")}"
     }
   }
@@ -235,7 +251,7 @@ resource "azurerm_network_interface" "apphost2nic" {
 
   ip_configuration {
     name                          = "ipconfiguration0"
-    subnet_id                     = "${azurerm_subnet.prodmgmt_sn.id}"
+    subnet_id                     = "${azurerm_subnet.prodmgmt_sn1.id}"
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = "${azurerm_public_ip.apphost2publicip.id}"
 
@@ -270,7 +286,7 @@ resource "azurerm_virtual_machine" "apphost2" {
   os_profile_linux_config {
     disable_password_authentication = false
         ssh_keys {
-          path     = "~/.ssh/authorized_keys"
+          path     = "/home/tudorfil/.ssh/authorized_keys"
           key_data = "${file("~/.ssh/id_rsa.pub")}"
     }
   }
@@ -311,7 +327,7 @@ resource "azurerm_traffic_manager_endpoint" "apphost1endpoint" {
   resource_group_name = "homework-tudorfil-rg"
   profile_name        = "${azurerm_traffic_manager_profile.wrktfmanprofile.name}"
   target_resource_id  = "${azurerm_virtual_machine.apphost1.id}"
-  type                = "azureEndpoints"
+  type                = "AzureEndpoints"
   priority              = 100
 }
 
@@ -320,6 +336,6 @@ resource "azurerm_traffic_manager_endpoint" "apphost2endpoint" {
   resource_group_name = "homework-tudorfil-rg"
   profile_name        = "${azurerm_traffic_manager_profile.wrktfmanprofile.name}"
   target_resource_id  = "${azurerm_virtual_machine.apphost2.id}"
-  type                = "azureEndpoints"
+  type                = "AzureEndpoints"
   priority              = 200
 }
