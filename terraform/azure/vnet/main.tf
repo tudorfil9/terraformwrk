@@ -42,7 +42,7 @@ data "azurerm_resource_group" "vnet_rg" {
 #  VIRTUAL NETWORKS
 ######################################################
 
-resource "azurerm_virtual_network" "vnet_vn" {
+resource "azurerm_virtual_network" "tfil-vnet" {
   name                = "${var.vnet_name}"
   address_space       = ["${var.vnet_cidr}"]
   location            = "${var.az_location}"
@@ -50,7 +50,7 @@ resource "azurerm_virtual_network" "vnet_vn" {
   // tags = "${var.tags_network}"
   }
 
-resource "azurerm_virtual_network" "vnet_vn1" {
+resource "azurerm_virtual_network" "tfil-vnet1" {
   name                = "${var.vnet_name1}"
   address_space       = ["${var.vnet_cidr}"]
   location            = "${var.az_location1}"
@@ -71,26 +71,26 @@ resource "azurerm_virtual_network" "vnet_vn1" {
 #  SUBNETS
 ######################################################
 
-resource "azurerm_subnet" "GatewaySubnet" {
-  name                 = "GatewaySubnet"
+// resource "azurerm_subnet" "GatewaySubnet" {
+//   name                 = "GatewaySubnet"
+//   resource_group_name  = "homework-tudorfil-rg"
+//   virtual_network_name = "${var.vnet_name}"
+//   address_prefix       = "10.0.0.0/26"
+// }
+
+resource "azurerm_subnet" "apphost1" {
+  name                 = "apphost1_sn"
   resource_group_name  = "homework-tudorfil-rg"
   virtual_network_name = "${var.vnet_name}"
   address_prefix       = "10.0.0.0/26"
-}
-
-resource "azurerm_subnet" "prodmgmt_sn" {
-  name                 = "prodmgmt_sn"
-  resource_group_name  = "homework-tudorfil-rg"
-  virtual_network_name = "${var.vnet_name}"
-  address_prefix       = "10.0.0.64/26"
   // network_security_group_id = "${azurerm_network_security_group.prodvn_nsg.id}"
 }
 
-resource "azurerm_subnet" "prodmgmt_sn1" {
-  name                 = "prodmgmt_sn1"
+resource "azurerm_subnet" "apphost2" {
+  name                 = "apphost2_sn"
   resource_group_name  = "homework-tudorfil-rg"
-  virtual_network_name = "${var.vnet_name1}"
-  address_prefix       = "10.0.0.128/26"
+  virtual_network_name = "${var.vnet_name}"
+  address_prefix       = "10.0.0.64/26"
   // network_security_group_id = "${azurerm_network_security_group.prodvn_nsg.id}"
 }
 
@@ -98,11 +98,11 @@ resource "azurerm_subnet" "prodmgmt_sn1" {
 # NETWORK SECURITY GROUPS
 ######################################################
 
-resource "azurerm_network_security_group" "prodmgmt_nsg" {
-  name                = "prodmgmt_nsg"
-  location            = "${var.az_location}"
-  resource_group_name = "homework-tudorfil-rg"  
-}
+// resource "azurerm_network_security_group" "prodmgmt_nsg" {
+//   name                = "prodmgmt_nsg"
+//   location            = "${var.az_location}"
+//   resource_group_name = "homework-tudorfil-rg"  
+// }
 
 ######################################################
 ## ASSOCIATION RESOURCES WILL BE AVAILABLE FOR AZURERM PROVIDER 2.0 for now they create problems.
@@ -121,24 +121,24 @@ resource "azurerm_network_security_group" "prodmgmt_nsg" {
 #  NETWORK SECURITY RULES
 ######################################################
 
-resource "azurerm_network_security_rule" "prodapplicationgatewaysnsr" {
-  name                        = "ssh"
-  priority                    = 102
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "22"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
-  resource_group_name         = "homework-tudorfil-rg"
-  network_security_group_name = "${azurerm_network_security_group.prodmgmt_nsg.name}"
+// resource "azurerm_network_security_rule" "prodapplicationgatewaysnsr" {
+//   name                        = "ssh"
+//   priority                    = 102
+//   direction                   = "Inbound"
+//   access                      = "Allow"
+//   protocol                    = "Tcp"
+//   source_port_range           = "*"
+//   destination_port_range      = "22"
+//   source_address_prefix       = "*"
+//   destination_address_prefix  = "*"
+//   resource_group_name         = "homework-tudorfil-rg"
+//   network_security_group_name = "${azurerm_network_security_group.prodmgmt_nsg.name}"
 
-  depends_on = [ 
-    "azurerm_subnet.prodmgmt_sn",
-    "azurerm_network_security_group.prodmgmt_nsg"
-    ]
-}
+//   depends_on = [ 
+//     "azurerm_subnet.prodmgmt_sn",
+//     "azurerm_network_security_group.prodmgmt_nsg"
+//     ]
+// }
 
 ######################################################
 # PUBLIC IPS
@@ -149,7 +149,7 @@ resource "azurerm_public_ip" "apphost1publicip" {
   name                = "apphost1publicip"
   location            = "${var.az_location}"
   resource_group_name = "homework-tudorfil-rg"
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
   // sku                 = "Basic"
   domain_name_label   = "wrkapphost1"
 }
@@ -158,7 +158,7 @@ resource "azurerm_public_ip" "apphost2publicip" {
   name                = "apphost2publicip"
   location            = "${var.az_location}"
   resource_group_name = "homework-tudorfil-rg"
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
   // sku                 = "Basic"
   domain_name_label   = "wrkapphost2"
 }
@@ -200,7 +200,7 @@ resource "azurerm_network_interface" "apphost1nic" {
 
   ip_configuration {
     name                          = "ipconfiguration0"
-    subnet_id                     = "${azurerm_subnet.prodmgmt_sn.id}"
+    subnet_id                     = "${azurerm_subnet.apphost1.id}"
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = "${azurerm_public_ip.apphost1publicip.id}"
   }
@@ -246,21 +246,20 @@ resource "azurerm_virtual_machine" "apphost1" {
 
 resource "azurerm_network_interface" "apphost2nic" {
   name                = "apphost2-nic0"
-  location            = "${var.az_location1}"
+  location            = "${var.az_location}"
   resource_group_name = "homework-tudorfil-rg"
 
   ip_configuration {
     name                          = "ipconfiguration0"
-    subnet_id                     = "${azurerm_subnet.prodmgmt_sn1.id}"
+    subnet_id                     = "${azurerm_subnet.apphost2.id}"
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = "${azurerm_public_ip.apphost2publicip.id}"
-
   }
 }
 
-resource "azurerm_virtual_machine" "apphost2" {
-  name                  = "apphost2"
-  location              = "${var.az_location1}"
+resource "azurerm_virtual_machine" "apphost2vm" {
+  name                  = "apphost2vm"
+  location              = "${var.az_location}"
   resource_group_name   = "homework-tudorfil-rg"
   network_interface_ids = ["${azurerm_network_interface.apphost2nic.id}"]
   vm_size               = "Standard_D2S_v3"
@@ -273,7 +272,7 @@ resource "azurerm_virtual_machine" "apphost2" {
     version   = "latest"
   }
   storage_os_disk {
-    name              = "osdisk1"
+    name              = "osdisk1vm2"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
@@ -293,25 +292,25 @@ resource "azurerm_virtual_machine" "apphost2" {
 }
 
 
-######################################################
-#  TRAFFIC MANAGER
-######################################################
-resource "random_id" "server" {
-  keepers = {
-    azi_id = 1
-  }
+// ######################################################
+// #  TRAFFIC MANAGER
+// ######################################################
+// resource "random_id" "server" {
+//   keepers = {
+//     azi_id = 1
+//   }
 
-  byte_length = 8
-}
+//   byte_length = 8
+// }
 
 resource "azurerm_traffic_manager_profile" "wrktfmanprofile" {
-  name                = "${random_id.server.hex}"
+  name                = "tfilhomeworktfman"
   resource_group_name = "homework-tudorfil-rg"
 
   traffic_routing_method = "Priority"
 
   dns_config {
-    relative_name = "${random_id.server.hex}"
+    relative_name = "tfilhomework"
     ttl           = 5
   }
 
@@ -322,20 +321,32 @@ resource "azurerm_traffic_manager_profile" "wrktfmanprofile" {
   }
 }
 
+
+data "azurerm_virtual_machine" "apphost1" {
+  name                = "apphost1"
+  resource_group_name = "homework-tudorfil-rg"
+}
+
+data "azurerm_virtual_machine" "apphost2" {
+  name                = "apphost2"
+  resource_group_name = "homework-tudorfil-rg"
+}
+
 resource "azurerm_traffic_manager_endpoint" "apphost1endpoint" {
-  name                = "${random_id.server.hex}"
+  name                = "apphost1endpoint"
   resource_group_name = "homework-tudorfil-rg"
   profile_name        = "${azurerm_traffic_manager_profile.wrktfmanprofile.name}"
-  target_resource_id  = "${azurerm_virtual_machine.apphost1.id}"
-  type                = "AzureEndpoints"
+  target_resource_id  = "/subscriptions/8e346e72-1237-4ba0-b40e-51bab197bf0d/resourceGroups/homework-tudorfil-rg/providers/Microsoft.Network/publicIPAddresses/apphost1publicip"
+  // target_resource_id  = "${data.azurerm_virtual_machine.apphost1.id}"
+  type                = "azureEndpoints"
   priority              = 100
 }
 
 resource "azurerm_traffic_manager_endpoint" "apphost2endpoint" {
-  name                = "${random_id.server.hex}"
+  name                = "apphost2endpoint"
   resource_group_name = "homework-tudorfil-rg"
   profile_name        = "${azurerm_traffic_manager_profile.wrktfmanprofile.name}"
-  target_resource_id  = "${azurerm_virtual_machine.apphost2.id}"
-  type                = "AzureEndpoints"
+  target_resource_id  = "/subscriptions/8e346e72-1237-4ba0-b40e-51bab197bf0d/resourceGroups/homework-tudorfil-rg/providers/Microsoft.Network/publicIPAddresses/apphost2publicip"
+  type                = "azureEndpoints"
   priority              = 200
 }

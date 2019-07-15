@@ -1,0 +1,2 @@
+stopcommand: "/opt/day/cq-author/quickstart stop"
+startcommand: "/opt/day/cq-author/quickstart start"

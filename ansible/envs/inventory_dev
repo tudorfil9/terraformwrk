@@ -1,0 +1,32 @@
+# Ansible hosts inventory file created by Davi Wall
+
+# Author instances
+author ansible_ssh_host=aem-author-dev1.platform.henkel.netcentric.biz ansible_user=opsuser appuser=day
+
+# Publish instances
+publish1 ansible_ssh_host=aem-publish1-dev1.platform.henkel.netcentric.biz ansible_user=opsuser appuser=day
+publish2 ansible_ssh_host=aem-publish2-dev1.platform.henkel.netcentric.biz ansible_user=opsuser appuser=day
+
+# Solr instances
+solr1 ansible_ssh_host=solr1-dev1.platform.henkel.netcentric.biz ansible_user=opsuser appuser=opsuser
+solr2 ansible_ssh_host=solr2-dev1.platform.henkel.netcentric.biz ansible_user=opsuser appuser=opsuser
+
+[author_servers]
+author
+
+[publish_servers]
+publish1
+publish2
+
+[solr_servers]
+solr1
+solr2
+
+[aem_servers:children]
+author_servers
+publish_servers
+
+[all_servers:children]
+author_servers
+publish_servers
+solr_servers

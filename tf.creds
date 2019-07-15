@@ -21,8 +21,8 @@ export TF_VAR_az_location="westeurope"
 export TF_VAR_az_location1="northeurope"
 
 export TF_VAR_vnet_cidr="10.0.0.0/24"
-export TF_VAR_vnet_name="vnet_vn"
-export TF_VAR_vnet_name1="vnet_vn1"
+export TF_VAR_vnet_name="tfil-vnet"
+export TF_VAR_vnet_name1="tfil-vnet1"
 
 export TF_VAR_wrk_root_pw="$wrk_root_pw"
 

@@ -1,0 +1,22 @@
+---
+- hosts: test_servers
+  tasks:
+    - name: "Check if AEM is alive"
+      uri:
+        url: "http://{{ ansible_host }}:4503/etc/healthcheck/50k.html"
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 60
+      delay: 1
+
+- hosts: test2_servers
+  tasks:
+    - name: "Check if AEM is alive"
+      uri:
+        url: "http://{{ ansible_host }}:4503/etc/healthcheck/50k.html"
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 60
+      delay: 1
