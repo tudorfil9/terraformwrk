@@ -5,7 +5,7 @@
         msg: ansible_ssh_host
 
 - name: Prepare Host
-  include: bootstrap.yaml
+  import_playbook: bootstrap.yaml
 
 - name: Install Application
-  include: deploy.yaml
+  import_playbook: deploy.yaml
