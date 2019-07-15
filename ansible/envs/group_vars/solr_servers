@@ -1,2 +1,0 @@
-stopcommand: "sudo /sbin/service solrd stop && sudo /sbin/service zookeeperd stop"
-startcommand: "sudo /sbin/service zookeeperd start && sudo /sbin/service solrd start"

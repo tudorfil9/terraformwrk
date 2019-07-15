@@ -1,0 +1,11 @@
+---
+- hosts: application_servers
+  tasks:
+    - debug:
+        msg: ansible_ssh_host
+
+- name: Prepare Host
+  include: bootstrap.yaml
+
+- name: Install Application
+  include: deploy.yaml

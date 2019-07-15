@@ -1,0 +1,23 @@
+# Created by Davi Wall and Felix Pafel for Henkel Adhesives
+# Logic: check current kernel version, update the vm, then check the current kernel again and compare to the first version. If different, then restart vm.
+---
+- hosts: test_servers
+  tasks:
+
+    - name: Start OS updates
+      yum: name=* state=latest
+      sudo: true
+
+    - name: Check latest installed/available kernel
+      shell: "rpm -q kernel --queryformat '%{installtime} %{version}-%{release}.%{arch}\n' | sort -n -k1 | tail -1 | cut -d ' ' -f 2"
+      register: new_kernel
+
+    - debug:
+        var: new_kernel
+
+    - name: Check current installed kernel
+      shell: uname -r
+      register: current_kernel
+
+    - debug:
+        var: current_kernel
