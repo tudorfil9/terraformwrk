@@ -1,4 +1,4 @@
 # application instances
 [application_servers]
 apphost1	ansible_ssh_host=wrkapphost1.westeurope.cloudapp.azure.com
-apphost2    ansible_ssh_hos=wrkapphost2.westeurope.cloudapp.azure.com
+apphost2    ansible_ssh_host=wrkapphost2.westeurope.cloudapp.azure.com
