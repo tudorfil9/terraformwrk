@@ -1,5 +1,7 @@
 # terraform 
 # ansible
+ansible-playbook ansible/playbooks/main.yaml -i ansible/envs/group_vars/inventory_all
+
 # az cli
 
 Ubuntu Server 18.04
